@@ -48,7 +48,7 @@
          <div class="form-group">
              <button type="submit" class="btn btn-success">
             {{ isset($post)? "Update post" : "Add post" }}
-            </button> 
+            </button>
          </div>
         </form>
     </div>
