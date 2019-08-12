@@ -24,16 +24,24 @@
       @foreach ($posts as $post)
           <tr>
               <td>
-                  <img src="{{ asset($post->image)}}" alt="">
+                <img src= "images/{{ $post->image }}" alt="Card image cap" height="60" weight="60">
                 </td>
               <td>
                   {{ $post->title }}
               </td>
-                
-                 @if(!$post->trashed())
+
+                 @if($post->trashed())
+                 <td>
+                 <form action="{{route('restore-posts',$post->id)}}">
+                 @csrf
+                 @method('PUT')
+                  <button type="submit" class="btn btn-info btn-sm">Restore</button>
+                 </form>
+                  </td>
+                  @else  
                   <td>
-                    <a href="" class="btn btn-info btn-sm">Edit</a>
-                  <td>
+                    <a href="{{ route('posts.edit',$post->id) }}" class="btn btn-info btn-sm">Edit</a>
+                  </td>
                   @endif
                   <td>
                   <form action="{{route('posts.destroy',$post->id)}}" method="POST">
@@ -47,7 +55,7 @@
           </tr>
       @endforeach
      </tbody>
-   </table>      
+   </table>
   @else
     <h3 class="text-center">No,Posts yet</h3>
   @endif
