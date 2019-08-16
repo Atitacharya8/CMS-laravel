@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Category;
 use App\Post;
 use Illuminate\Http\Request;
 use App\Http\Requests\Posts\CreatePostsRequest;
@@ -26,13 +27,13 @@ class PostsController extends Controller
      */
     public function create()
     {
-        return view('posts.create');
+        return view('posts.create')->with('categories', Category::all());
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(CreatePostsRequest $request)
@@ -45,7 +46,6 @@ class PostsController extends Controller
         ]);
 
 
-
         $imageName = time() . '.' . request()->image->getClientOriginalExtension();
         request()->image->move(public_path('images'), $imageName);
 
@@ -55,9 +55,9 @@ class PostsController extends Controller
             'description' => $request->description,
             'content' => $request->content,
             'image' => $imageName,
+            'category_id' => $request->category,
             'published_at' => $request->published_at
         ]);
-
 
 
         //flash message
@@ -69,7 +69,7 @@ class PostsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -80,44 +80,43 @@ class PostsController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit(Post $post)
     {
-        return view('posts.create')->with('post', $post);
+        return view('posts.create')->with('post', $post)->with('categories',Category::all());
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(UpdatePostRequest $request, Post $post)
     {
-        $data=$request->only(['title','description','content','published_at']);
+        $data = $request->only(['title', 'description', 'content', 'published_at']);
 
         //check if new image
-        if($request->hasFile('image')){
-                //upload it
-                request()->validate([
+        if ($request->hasFile('image')) {
+            //upload it
+            request()->validate([
 
-                    'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        
-                ]);
-                $imageName = time() . '.' . request()->image->getClientOriginalExtension();
-                request()->image->move(public_path('images'), $imageName);
-                
-                //delete old one
-                $post->deleteImage();
-             
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
 
-                $data['image']=$imageName;
-                
+            ]);
+            $imageName = time() . '.' . request()->image->getClientOriginalExtension();
+            request()->image->move(public_path('images'), $imageName);
+
+            //delete old one
+            $post->deleteImage();
+
+
+            $data['image'] = $imageName;
         }
-      
+
 
         //update attribute
         $post->update($data);
@@ -127,13 +126,12 @@ class PostsController extends Controller
 
         //redirect user
         return redirect(route('posts.index'));
-        
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
@@ -149,10 +147,11 @@ class PostsController extends Controller
         session()->flash('success', "post deleted successfully.");
         return redirect(route('posts.index'));
     }
+
     /**
      * Display the trashed posts list
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
 
@@ -162,11 +161,11 @@ class PostsController extends Controller
         return view('posts.index')->with('posts', $trashed);
     }
 
-    public function restore($id){
-        $post=Post::withTrashed()->where('id',$id)->firstofFail();
+    public function restore($id)
+    {
+        $post = Post::withTrashed()->where('id', $id)->firstOrFail();
         $post->restore();
         session()->flash('success', "post restored successfully.");
         return redirect()->back();
-
     }
 }

@@ -27,8 +27,9 @@ class CreatePostsRequest extends FormRequest
             'title'=>'required|unique:posts',
             'description'=>'required',
             'content'=>'required',
-            // 'published_at'=>'required'
-            'image'=>'required|image'
+             'published_at'=>'required',
+            'image'=>'required|image',
+            'category'=>'required'
         ];
     }
 }

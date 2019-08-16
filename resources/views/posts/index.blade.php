@@ -1,4 +1,4 @@
-@extends('layouts.app')
+  @extends('layouts.app')
 
 
 @section('content')
@@ -17,6 +17,7 @@
      <thead>
        <th>Image</th>
        <th>Title</th>
+       <th>Category</th>
        <th></th>
        <th></th>
      </thead>
@@ -24,21 +25,23 @@
       @foreach ($posts as $post)
           <tr>
               <td>
-                <img src= "images/{{ $post->image }}" alt="Card image cap" height="60" weight="60">
+                  <img src="images/{{ $post->image }}" alt="Card image cap" height="100" weight="100">
                 </td>
               <td>
                   {{ $post->title }}
               </td>
-
+                <td>
+                    <a href="{{route('categories.edit',$post->category->id)}}">{{$post->category->name}}</a>
+                </td>
                  @if($post->trashed())
                  <td>
-                 <form action="{{route('restore-posts',$post->id)}}">
+                 <form action="{{route('restore-posts',$post->id)}}" method="POST">
                  @csrf
                  @method('PUT')
                   <button type="submit" class="btn btn-info btn-sm">Restore</button>
                  </form>
                   </td>
-                  @else  
+                  @else
                   <td>
                     <a href="{{ route('posts.edit',$post->id) }}" class="btn btn-info btn-sm">Edit</a>
                   </td>
